@@ -160,7 +160,7 @@
     
     UIBezierPath *rightBezier = [UIBezierPath bezierPath];
     [rightBezier moveToPoint:CGPointMake(0, 0)];
-    [rightBezier addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height/2)];
+    [rightBezier addLineToPoint:CGPointMake(self.frame.size.width-0.5, self.frame.size.height/2)];
     [rightBezier addLineToPoint:CGPointMake(0, self.frame.size.height)];
     [rightBezier addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height)];
     [rightBezier addLineToPoint:CGPointMake(self.frame.size.width, 0)];
@@ -178,10 +178,10 @@
     
     UIBezierPath *bezier = [UIBezierPath bezierPath];
     [bezier moveToPoint:CGPointMake(0, 0)];
-    [bezier addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height/2)];
+    [bezier addLineToPoint:CGPointMake(self.frame.size.width-0.5, self.frame.size.height/2)];
     [bezier addLineToPoint:CGPointMake(0, self.frame.size.height)];
     
-    [bezier setLineWidth:1.0];
+    [bezier setLineWidth:0.5];
     [bezier setLineJoinStyle:kCGLineJoinBevel];
     
     [self.seperatorColor setStroke];
@@ -229,16 +229,16 @@
         self.translatesAutoresizingMaskIntoConstraints = NO;
         self.clipsToBounds = YES;
         
-        self.topLine.frame = CGRectMake(0, frame.size.height-44, frame.size.width, 1);
+        self.topLine.frame = CGRectMake(0, frame.size.height-43, frame.size.width, 0.4);
         [self addSubview:self.topLine];
         
-        self.bottomLine.frame = CGRectMake(0, frame.size.height-1, frame.size.width, 1);
+        self.bottomLine.frame = CGRectMake(0, frame.size.height-0.5, frame.size.width, 0.5);
         [self addSubview:self.bottomLine];
         
         self.cancelButton.frame = CGRectMake(0, frame.size.height-43, RM_CANCEL_BUTTON_WIDTH, 42);
         [self addSubview:self.cancelButton];
         
-        self.cancelSeperator.frame = CGRectMake(RM_CANCEL_BUTTON_WIDTH, frame.size.height-44, 1, frame.size.height);
+        self.cancelSeperator.frame = CGRectMake(RM_CANCEL_BUTTON_WIDTH, frame.size.height-44, 0.5, frame.size.height);
         [self addSubview:self.cancelSeperator];
         
         NSNumber *cancelWidth = @(RM_CANCEL_BUTTON_WIDTH);
@@ -248,14 +248,14 @@
         
         [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-(0)-[_topLine]-(0)-|" options:0 metrics:metricsDict views:bindingsDict]];
         [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-(0)-[_bottomLine]-(0)-|" options:0 metrics:metricsDict views:bindingsDict]];
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_cancelButton(cancelWidth)]-(0)-[_cancelSeperator(1)]" options:0 metrics:metricsDict views:bindingsDict]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_cancelButton(cancelWidth)]-(0)-[_cancelSeperator(0.5)]" options:0 metrics:metricsDict views:bindingsDict]];
         
         self.cancelButtonXConstraint = [[NSLayoutConstraint constraintsWithVisualFormat:@"|-(0)-[_cancelButton]" options:0 metrics:metricsDict views:bindingsDict] lastObject];
         [self addConstraint:self.cancelButtonXConstraint];
         
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_topLine(1)]-(42)-[_bottomLine(1)]-(0)-|" options:0 metrics:metricsDict views:bindingsDict]];
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_cancelButton(42)]-(1)-|" options:0 metrics:metricsDict views:bindingsDict]];
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_cancelSeperator(42)]-(1)-|" options:0 metrics:metricsDict views:bindingsDict]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_topLine(0.5)]-(43)-[_bottomLine(0.5)]-(0)-|" options:0 metrics:metricsDict views:bindingsDict]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_cancelButton(43)]-(0.5)-|" options:0 metrics:metricsDict views:bindingsDict]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_cancelSeperator(43)]-(0.5)-|" options:0 metrics:metricsDict views:bindingsDict]];
         
         [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(recognizedTap:)]];
     }
@@ -330,6 +330,7 @@
     }
 }
 
+
 - (UIButton *)cancelButton {
     if(!_cancelButton) {
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -388,6 +389,7 @@
                 step.titleLabel.textColor = step.enabledTextColor;
                 step.numberLabel.textColor = step.enabledTextColor;
                 step.circleLayer.strokeColor = step.enabledTextColor.CGColor;
+                step.hideNumberLabel = NO;
             };
             
             if(animated)
@@ -403,6 +405,7 @@
                 step.titleLabel.textColor = step.selectedTextColor;
                 step.numberLabel.textColor = step.selectedTextColor;
                 step.circleLayer.strokeColor = step.selectedTextColor.CGColor;
+                step.hideNumberLabel = self.hideNumberLabelWhenActiveStep;
             };
             
             if(animated)
@@ -418,6 +421,7 @@
                 step.titleLabel.textColor = step.disabledTextColor;
                 step.numberLabel.textColor = step.disabledTextColor;
                 step.circleLayer.strokeColor = step.disabledTextColor.CGColor;
+                step.hideNumberLabel = NO;
             };
             
             if(animated)
@@ -697,7 +701,7 @@
         
         if(CGRectContainsPoint(step.stepView.frame, touchLocation)) {
             NSInteger index = [self.stepDictionaries indexOfObject:aStepDict];
-            if(index < self.indexOfSelectedStep) {
+            if(index < self.indexOfSelectedStep && self.allowBackward) {
                 [self.delegate stepsBar:self shouldSelectStepAtIndex:index];
             }
         }

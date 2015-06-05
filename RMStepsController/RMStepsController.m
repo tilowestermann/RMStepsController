@@ -205,7 +205,7 @@
     NSInteger index = [self.childViewControllers indexOfObject:self.currentStepViewController];
     if(index < [self.childViewControllers count]-1) {
         UIViewController *nextStepViewController = [self.childViewControllers objectAtIndex:index+1];
-        [self showStepViewController:nextStepViewController animated:YES];
+        [self showStepViewController:nextStepViewController animated:self.showStepsAnimated];
     } else {
         [self finishedAllSteps];
     }
@@ -215,7 +215,7 @@
     NSInteger index = [self.childViewControllers indexOfObject:self.currentStepViewController];
     if(index > 0) {
         UIViewController *nextStepViewController = [self.childViewControllers objectAtIndex:index-1];
-        [self showStepViewController:nextStepViewController animated:YES];
+        [self showStepViewController:nextStepViewController animated:self.showStepsAnimated];
     } else {
         [self canceled];
     }

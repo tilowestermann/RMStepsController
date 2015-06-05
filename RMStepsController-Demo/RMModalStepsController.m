@@ -75,4 +75,8 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (BOOL)showStepsAnimated {
+    return NO;
+}
+
 @end

@@ -54,6 +54,11 @@
  */
 @property (nonatomic, strong, readonly) NSMutableDictionary *results;
 
+/**
+ Whether or not the steps should be animated.
+ */
+@property (nonatomic) BOOL showStepsAnimated;
+
 /// @name Instance Methods
 
 /**
